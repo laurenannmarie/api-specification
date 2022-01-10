@@ -1363,8 +1363,8 @@ components:
                 stream_url:
                   type: array
                   items:
-                    type: string
-                  example: ["https://example.com/"]
+                    $ref: '#/components/schemas/string_uri'
+                  example: ['https://example.com/']
               required:
                 - level
                 - loop
@@ -1963,27 +1963,26 @@ components:
             _embedded:
               $ref: '#/components/schemas/event_embedded'
             body:
-              oneOf:
-                - type: object
-                  properties:
-                    level:
-                      $ref: '#/components/schemas/level'
-                    loop:
-                      type: integer
-                      example: 0
-                    stream_url:
-                      type: array
-                      items:
-                        $ref: '#/components/schemas/string_uri'
-                      example: "['https://example.com/']"
-                    play_id:
-                      type: string
-                      example: "87d3988b-6818-475f-8712-9f57804371ec"
-                  required:
-                    - level
-                    - loop
-                    - stream_url
-                    - play_id
+              type: object
+              properties:
+                level:
+                  $ref: '#/components/schemas/level'
+                loop:
+                  type: integer
+                  example: 0
+                stream_url:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/string_uri'
+                  example: ['https://example.com/']
+                play_id:
+                  type: string
+                  example: "87d3988b-6818-475f-8712-9f57804371ec"
+              required:
+                - level
+                - loop
+                - stream_url
+                - play_id
                 # - type: object
                 #   properties:
                 #     timestamp:
@@ -2014,14 +2013,13 @@ components:
             timestamp:
               $ref: '#/components/schemas/iso_date'
             body:
-              oneOf:
-                - type: object
-                  properties:
-                    play_id:
-                      type: string
-                      example: "87d3988b-6818-475f-8712-9f57804371ec"
-                  required:
-                    - play_id
+              type: object
+              properties:
+                play_id:
+                  type: string
+                  example: "87d3988b-6818-475f-8712-9f57804371ec"
+              required:
+                - play_id
                 # - type: object
                 #   properties:
                 #     timestamp:
@@ -2063,29 +2061,28 @@ components:
             _embedded:
               $ref: '#/components/schemas/event_embedded'
             body:
-              oneOf:
-                - type: object
-                  properties:
-                    level:
-                      $ref: '#/components/schemas/level'
-                    loop:
-                      type: integer
-                      example: 0
-                    language:
-                      $ref: '#/components/schemas/language'
-                    style:
-                      $ref: '#/components/schemas/style'
-                    text:
-                      type: string
-                      example: "Hello World"
-                    say_id:
-                      type: string
-                      example: "8726c52f-6132-40e6-bb37-a5a2587ea36d"
-                  required:
-                    - level
-                    - loop
-                    - text
-                    - say_id
+              type: object
+              properties:
+                level:
+                  $ref: '#/components/schemas/level'
+                loop:
+                  type: integer
+                  example: 0
+                language:
+                  $ref: '#/components/schemas/language'
+                style:
+                  $ref: '#/components/schemas/style'
+                text:
+                  type: string
+                  example: "Hello World"
+                say_id:
+                  type: string
+                  example: "8726c52f-6132-40e6-bb37-a5a2587ea36d"
+              required:
+                - level
+                - loop
+                - text
+                - say_id
                 # - type: object
                 #   properties:
                 #     timestamp:
@@ -2120,14 +2117,13 @@ components:
             _embedded:
               $ref: '#/components/schemas/event_embedded'
             body:
-              oneOf:
-                - type: object
-                  properties:
-                    say_id:
-                      type: string
-                      example: "8726c52f-6132-40e6-bb37-a5a2587ea36d"
-                  required:
-                    - say_id
+              type: object
+              properties:
+                say_id:
+                  type: string
+                  example: "8726c52f-6132-40e6-bb37-a5a2587ea36d"
+              required:
+                - say_id
                 # - type: object
                 #   properties:
                 #     timestamp:
