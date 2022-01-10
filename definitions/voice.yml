@@ -604,8 +604,6 @@ components:
           $ref: "#/components/schemas/language"
         style:
           $ref: "#/components/schemas/style"
-        voice_name:
-          $ref: "#/components/schemas/voice_name"
         loop:
           type: integer
           description: The number of times to repeat the text the file, 0
@@ -1278,114 +1276,10 @@ components:
         - "vi-VN"
         - "yue-CN"
     style:
-      description: The vocal style (vocal range, tessitura, and timbre) to use
+      description: The vocal style (vocal range, tessitura, and timbre) to use. see [the TTS guide](https://developer.nexmo.com/voice/voice-api/guides/text-to-speech#supported-languages) for details
       type: integer
       default: 0
-      example: 0
-      
-    voice_name:
-      description: <strong>DEPRECATED</strong> The voice & language to use
-      type: string
-      deprecated: true
-      default: Kimberly
-      example: Kimberly
-      enum:
-        - Aditi
-        - Agnieszka
-        - Alva
-        - Amy
-        - Astrid
-        - Bianca
-        - Brian
-        - Carla
-        - Carmen
-        - Carmit
-        - Catarina
-        - Celine
-        - Cem
-        - Chantal
-        - Chipmunk
-        - Conchita
-        - Cristiano
-        - Damayanti
-        - Dora
-        - Emma
-        - Empar
-        - Enrique
-        - Eric
-        - Ewa
-        - Felipe
-        - Filiz
-        - Geraint
-        - Giorgio
-        - Gwyneth
-        - Hans
-        - Henrik
-        - Ines
-        - Ioana
-        - Iveta
-        - Ivy
-        - Jacek
-        - Jan
-        - Jennifer
-        - Joana
-        - Joanna
-        - Joey
-        - Jordi
-        - Justin
-        - Kanya
-        - Karl
-        - Kendra
-        - Kimberly
-        - Laila
-        - Laura
-        - Lea
-        - Lekha
-        - Liv
-        - Lotte
-        - Lucia
-        - Luciana
-        - Mads
-        - Maged
-        - Maja
-        - Mariska
-        - Marlene
-        - Mathieu
-        - Matthew
-        - Maxim
-        - Mei-Jia
-        - Melina
-        - Mia
-        - Miguel
-        - Miren
-        - Mizuki
-        - Montserrat
-        - Naja
-        - Nicole
-        - Nikos
-        - Nora
-        - Oskar
-        - Penelope
-        - Raveena
-        - Ricardo
-        - Ruben
-        - Russell
-        - Salli
-        - Satu
-        - Seoyeon
-        - Sin-Ji
-        - Sora
-        - Takumi
-        - Tarik
-        - Tatyana
-        - Tessa
-        - Tian-Tian
-        - Vicki
-        - Vitoria
-        - Yelda
-        - Zeina
-        - Zhiyu
-        - Zuzana
+      example: 3
 
     ConversationEventRequest:
       oneOf:
@@ -1461,25 +1355,23 @@ components:
             body:
               type: object
               properties:
-                queue:
-                  type: boolean
-                  example: true
                 level:
                   $ref: '#/components/schemas/level'
                 loop:
                   type: integer
                   example: 0
                 stream_url:
-                  type: string
+                  type: array
                   items:
-                    $ref: '#/components/schemas/string_uri'
-                  example: "['https://example.com/']"
+                    type: string
+                  example: ["https://example.com/"]
               required:
                 - level
                 - loop
                 - stream_url
           required:
             - type
+            - body
     
     ConversationEventRequestAudioPlayStop:
       allOf:
@@ -1490,20 +1382,17 @@ components:
               enum:
                 - 'audio:play:stop'
               example: 'audio:play:stop'
-            to:
-              $ref: '#/components/schemas/member_id'
-            from:
-              $ref: '#/components/schemas/nullable_member_id'
             body:
               type: object
               properties:
                 play_id:
                   type: string
-                  example: 'ToDo'
+                  example: "87d3988b-6818-475f-8712-9f57804371ec"
               required:
                 - play_id
           required:
             - type
+            - body
 
     ConversationEventRequestAudioSay:
       allOf:
@@ -1526,26 +1415,20 @@ components:
                 loop:
                   type: integer
                   example: 0
-                queue:
-                  type: boolean
-                voice_name:
-                  type: string
                 language:
                   $ref: '#/components/schemas/language'
                 style:
                   $ref: '#/components/schemas/style'
                 text:
                   type: string
-                  example: ''
-                ssml:
-                  type: boolean
-                  example: true
+                  example: "Hello World"
               required:
                 - level
                 - loop
                 - text
           required:
             - type
+            - body
 
     ConversationEventRequestAudioSayStop:
       allOf:
@@ -1556,20 +1439,17 @@ components:
               enum:
                 - 'audio:say:stop'
               example: 'audio:say:stop'
-            to:
-              $ref: '#/components/schemas/member_id'
-            from:
-              $ref: '#/components/schemas/nullable_member_id'
             body:
               type: object
               properties:
                 say_id:
                   type: string
-                  example: 'ToDo'
+                  example: "c3189b31-8fb5-40b6-b784-46b8f4511ed0"
               required:
                 - say_id
           required:
             - type
+            - body
 
     ConversationEventRequestAudioDtmf:
       allOf:
@@ -1787,7 +1667,7 @@ components:
       description: Member ID, indicates the member affected 
       example: MEM-63f61863-4a51-4f6b-86e1-234523afb34c
     nullable_member_id:
-      description: Member ID
+      description: Member ID, indicates the intiating member
       type: string
       nullable: true
       example: MEM-63f61863-4a51-4f6b-86e1-46edebio0391
@@ -1799,7 +1679,7 @@ components:
       example: 0
     string_uri:
       description: String URI
-      example: 'https://example.com/'
+      example: "https://example.com/"
       type: string
     dtmf_pattern:
       pattern: '^([abcdABCD0-9*#pP])+$'
@@ -2080,16 +1960,12 @@ components:
               $ref: '#/components/schemas/event_id'
             timestamp:
               $ref: '#/components/schemas/iso_date'
-            state:
-              $ref: '#/components/schemas/event_state'
             _embedded:
               $ref: '#/components/schemas/event_embedded'
             body:
               oneOf:
                 - type: object
                   properties:
-                    queue:
-                      type: boolean
                     level:
                       $ref: '#/components/schemas/level'
                     loop:
@@ -2102,21 +1978,21 @@ components:
                       example: "['https://example.com/']"
                     play_id:
                       type: string
-                      example: 'ToDo'
+                      example: "87d3988b-6818-475f-8712-9f57804371ec"
                   required:
                     - level
                     - loop
                     - stream_url
                     - play_id
-                - type: object
-                  properties:
-                    timestamp:
-                      type: object
-                      properties:
-                        deleted:
-                          $ref: '#/components/schemas/iso_date'
-                      required:
-                        - deleted
+                # - type: object
+                #   properties:
+                #     timestamp:
+                #       type: object
+                #       properties:
+                #         deleted:
+                #           $ref: '#/components/schemas/iso_date'
+                #       required:
+                #         - deleted
             _links:
               $ref: '#/components/schemas/_links'
           required:
@@ -2128,10 +2004,6 @@ components:
           x-tab-id: audio-play-stop
           type: object
           properties:
-            to:
-              $ref: '#/components/schemas/member_id'
-            from:
-              $ref: '#/components/schemas/nullable_member_id'
             type:
               type: string
               enum:
@@ -2141,34 +2013,33 @@ components:
               $ref: '#/components/schemas/event_id'
             timestamp:
               $ref: '#/components/schemas/iso_date'
-            state:
-              $ref: '#/components/schemas/event_state'
-            _embedded:
-              $ref: '#/components/schemas/event_embedded'
             body:
               oneOf:
                 - type: object
                   properties:
                     play_id:
                       type: string
-                      example: 'ToDo'
+                      example: "87d3988b-6818-475f-8712-9f57804371ec"
                   required:
                     - play_id
-                - type: object
-                  properties:
-                    timestamp:
-                      type: object
-                      properties:
-                        deleted:
-                          $ref: '#/components/schemas/iso_date'
-                      required:
-                        - deleted
+                # - type: object
+                #   properties:
+                #     timestamp:
+                #       type: object
+                #       properties:
+                #         deleted:
+                #           $ref: '#/components/schemas/iso_date'
+                #       required:
+                #         - deleted
+            _embedded:
+              $ref: '#/components/schemas/event_embedded'
             _links:
               $ref: '#/components/schemas/_links'
           required:
             - type
             - id
             - timestamp
+            - body
             - _links
         - description: audio:say
           x-tab-id: audio-say
@@ -2187,8 +2058,8 @@ components:
               $ref: '#/components/schemas/event_id'
             timestamp:
               $ref: '#/components/schemas/iso_date'
-            state:
-              $ref: '#/components/schemas/event_state'
+            # state:
+            #   $ref: '#/components/schemas/event_state'
             _embedded:
               $ref: '#/components/schemas/event_embedded'
             body:
@@ -2200,36 +2071,30 @@ components:
                     loop:
                       type: integer
                       example: 0
-                    queue:
-                      type: boolean
-                    voice_name:
-                      type: string
                     language:
                       $ref: '#/components/schemas/language'
                     style:
                       $ref: '#/components/schemas/style'
                     text:
                       type: string
-                      example: ''
-                    ssml:
-                      type: boolean
+                      example: "Hello World"
                     say_id:
                       type: string
-                      example: 'ToDo'
+                      example: "8726c52f-6132-40e6-bb37-a5a2587ea36d"
                   required:
                     - level
                     - loop
                     - text
                     - say_id
-                - type: object
-                  properties:
-                    timestamp:
-                      type: object
-                      properties:
-                        deleted:
-                          $ref: '#/components/schemas/iso_date'
-                      required:
-                        - deleted
+                # - type: object
+                #   properties:
+                #     timestamp:
+                #       type: object
+                #       properties:
+                #         deleted:
+                #           $ref: '#/components/schemas/iso_date'
+                #       required:
+                #         - deleted
             _links:
               $ref: '#/components/schemas/_links'
           required:
@@ -2241,10 +2106,6 @@ components:
           x-tab-id: audio-say-stop
           type: object
           properties:
-            to:
-              $ref: '#/components/schemas/member_id'
-            from:
-              $ref: '#/components/schemas/nullable_member_id'
             type:
               type: string
               enum:
@@ -2254,8 +2115,8 @@ components:
               $ref: '#/components/schemas/event_id'
             timestamp:
               $ref: '#/components/schemas/iso_date'
-            state:
-              $ref: '#/components/schemas/event_state'
+            # state:
+            #   $ref: '#/components/schemas/event_state'
             _embedded:
               $ref: '#/components/schemas/event_embedded'
             body:
@@ -2264,24 +2125,25 @@ components:
                   properties:
                     say_id:
                       type: string
-                      example: 'ToDo'
+                      example: "8726c52f-6132-40e6-bb37-a5a2587ea36d"
                   required:
                     - say_id
-                - type: object
-                  properties:
-                    timestamp:
-                      type: object
-                      properties:
-                        deleted:
-                          $ref: '#/components/schemas/iso_date'
-                      required:
-                        - deleted
+                # - type: object
+                #   properties:
+                #     timestamp:
+                #       type: object
+                #       properties:
+                #         deleted:
+                #           $ref: '#/components/schemas/iso_date'
+                #       required:
+                #         - deleted
             _links:
               $ref: '#/components/schemas/_links'
           required:
             - type
             - id
             - timestamp
+            - body
             - _links
         - description: audio:dtmf
           x-tab-id: audio-dtmf
