@@ -1,8 +1,8 @@
 openapi: 3.0.2
 info:
   title: Vonage Verify API (v2)
-  version: 0.0.3
-  description: Verify API provides a choice of routes for sending a PIN code to a user. You can use this to confirm a user's contact information, as a second factor when authenticating users, or for step-up authentication.
+  version: 0.0.4
+  description: Verify API provides a choice of routes for sending a code to a user. You can use this to confirm a user's contact information, as a second factor when authenticating users, or for step-up authentication.
   contact:
     name: Vonage DevRel
     email: devrel@vonage.ctom
@@ -83,11 +83,11 @@ paths:
         #         $ref: "#/components/schemas/ErrorInvalidRequest"
 
     post:
-      operationId: checkPIN
-      summary: Check a supplied PIN against a request to see if it is valid
-      description: Allows a PIN to be checked against an existing Verification request
+      operationId: checkCode
+      summary: Check a supplied code against a request to see if it is valid
+      description: Allows a code to be checked against an existing Verification request
       requestBody:
-        $ref: '#/components/requestBodies/CheckPINRequest'
+        $ref: '#/components/requestBodies/CheckCodeRequest'
 
       responses:
         "204":
@@ -157,29 +157,29 @@ x-webhooks:
 
 components:
   requestBodies:
-    CheckPINRequest:
+    CheckCodeRequest:
       required: true
       content:
         application/json:
           schema:
             type: object
             required:
-              - pin
+              - code
             properties:
-              pin:
-                $ref: '#/components/schemas/PIN'
+              code:
+                $ref: '#/components/schemas/code'
 
     NewVerificationRequest:
       required: true
       content: 
         application/json:
           schema:
-            $ref: '#/components/schemas/NewPINRequest'
+            $ref: '#/components/schemas/NewCodeRequest'
             # oneOf:
-            #   - title: PIN Verification
-            #     x-tab-id: PINVerification
+            #   - title: Code Verification
+            #     x-tab-id: CodeVerificiation
             #     allOf:
-            #       - $ref: '#/components/schemas/NewPINRequest'
+            #       - $ref: '#/components/schemas/NewCodeRequest'
             #   - title: PSD2 Verification
             #     x-tab-id: PSD2Verification
             #     allOf:
@@ -215,17 +215,17 @@ components:
           $ref: '#/components/schemas/ChannelTimeout'
         client_ref:
           $ref: '#/components/schemas/ClientRef'
-        pin_length:
-          $ref: '#/components/schemas/PINLength'
-        # pin_expiry:
-        #   $ref: '#/components/schemas/PINExpiry'
+        code_length:
+          $ref: '#/components/schemas/CodeLength'
+        # code_expiry:
+        #   $ref: '#/components/schemas/CodeExpiry'
 
-    NewPINRequest:
+    NewCodeRequest:
       oneOf:
-        - $ref: '#/components/schemas/NewPINRequestWorkflowSMS'
-        - $ref: '#/components/schemas/NewPINRequestWorkflowWhatsApp'
+        - $ref: '#/components/schemas/NewCodeRequestWorkflowSMS'
+        - $ref: '#/components/schemas/NewCodeRequestWorkflowWhatsApp'
 
-    NewPINRequestWorkflowSMS:
+    NewCodeRequestWorkflowSMS:
       title: SMS
       x-tab-id: WorkflowSMS
       allOf:
@@ -234,7 +234,7 @@ components:
           required:
             - workflow
             - brand
-          description: Request a PIN be sent to a user
+          description: Request a code be sent to a user
           properties:
             workflow:
               type: array
@@ -259,13 +259,13 @@ components:
                 }
               ]
 
-    NewPINRequestWorkflowWhatsApp:
+    NewCodeRequestWorkflowWhatsApp:
       title: WhatsApp
       x-tab-id: WorkflowWhatsApp
       allOf:
         - $ref: '#/components/schemas/NewRequestBase'
         - type: object
-          description: Request a PIN be sent to a user
+          description: Request a code be sent to a user
           properties:
             workflow:
               type: array
@@ -299,7 +299,7 @@ components:
       allOf:
         - $ref: '#/components/schemas/NewRequestBase'
         - type: object
-          description: Request a PIN be sent to a user
+          description: Request a code be sent to a user
           properties:
             amount:
               type: string
@@ -351,9 +351,9 @@ components:
       example: '447700900000'
       description: The phone number to contact, in the [E.164](https://en.wikipedia.org/wiki/E.164) format. Don't use a leading + or 00 when entering a phone number, start with the country code, for example, 447700900000.
 
-    PINLength:
+    CodeLength:
       type: integer
-      description: Length of the PIN to send to the user
+      description: Length of the code to send to the user
       default: 4
       example: 4
       enum:
@@ -492,9 +492,9 @@ components:
         #         example: "2020-01-01T14:00:00.000Z"
 
 
-    PIN:
+    code:
       type: string
-      description: The PIN the user supplied
+      description: The code the user supplied
       example: 1234
       minLength: 4
       maxLength: 10
