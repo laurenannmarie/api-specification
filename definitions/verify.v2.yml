@@ -1,7 +1,7 @@
 openapi: 3.0.2
 info:
   title: Vonage Verify API (v2)
-  version: 0.0.4
+  version: 0.0.5
   description: Verify API provides a choice of routes for sending a code to a user. You can use this to confirm a user's contact information, as a second factor when authenticating users, or for step-up authentication.
   contact:
     name: Vonage DevRel
@@ -397,13 +397,15 @@ components:
         status:
           type: string
           description: Current status of this request
-          example: in_progress
+          example: completed
           enum:
-            - in_progress
             - completed
             - failed
             - expired
-            - cancelled
+        channel_timeout:
+          type: integer
+          description: >-
+            The number of seconds before the current step in the verification request times out.
         workflow:
           type: array
           items:
@@ -420,17 +422,12 @@ components:
                 type: string
                 description: >-
                   The date and time the current step in the verification request was initiated, in ISO 8601 format.
-              timeout_seconds:
-                type: integer
-                description: >-
-                  The number of seconds before the current step in the verification request times out.
               status:
                 type: string
                 description: Current status of this request
-                example: in_progress
+                example: completed
                 enum:
                   - unused
-                  - in_progress
                   - completed
                   - failed
                   - expired
@@ -439,14 +436,12 @@ components:
             {
               "channel": "sms",
               "initiated_at": "2020-01-01T14:00:00.000Z",
-              "timeout_seconds": 60,
               "status": "expired"
             },
             {
               "channel": "whatsapp",
               "initiated_at": "2020-01-01T14:02:00.000Z",
-              "timeout_seconds": 300,
-              "status": "in_progress"
+              "status": "completed"
             },
             {
               "channel": "voice",
