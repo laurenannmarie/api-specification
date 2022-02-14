@@ -153,7 +153,19 @@ x-webhooks:
             application/json:
               schema:
                 $ref: '#/components/schemas/VerifyResource'
-
+  events:
+    '{$request.body#/callback}':
+      post:
+        summary: Events Callback
+        operationId: event-callback
+        x-example-path: '/webhooks/events-callback'
+        description: An inbound events webhook.
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifyResourceWhatsappInteractive'
 
 components:
   requestBodies:
@@ -210,7 +222,6 @@ components:
           $ref: '#/components/schemas/Brand'
         locale:
           $ref: '#/components/schemas/Language'
-
         channel_timeout:
           $ref: '#/components/schemas/ChannelTimeout'
         client_ref:
@@ -224,6 +235,7 @@ components:
       oneOf:
         - $ref: '#/components/schemas/NewCodeRequestWorkflowSMS'
         - $ref: '#/components/schemas/NewCodeRequestWorkflowWhatsApp'
+        - $ref: '#/components/schemas/NewCodeRequestWorkflowWhatsAppInteractive'
 
     NewCodeRequestWorkflowSMS:
       title: SMS
@@ -274,6 +286,7 @@ components:
                 properties:
                   channel:
                     type: string
+                    description: "The channel"
                     enum: 
                       - whatsapp
                     example: whatsapp
@@ -288,6 +301,43 @@ components:
               example: [
                   {
                     "channel": "whatsapp",
+                    "to": "447700900000"
+                  }
+                ]
+          required:
+            - workflow
+            - brand
+
+    NewCodeRequestWorkflowWhatsAppInteractive:
+      title: WhatsApp-Interactive
+      x-tab-id: WorkflowWhatsAppInteractive
+      allOf:
+        - $ref: '#/components/schemas/NewRequestBase'
+        - type: object
+          description: Request a code be sent to a user
+          properties:
+            workflow:
+              type: array
+              items:
+                type: object
+                properties:
+                  channel:
+                    type: string
+                    description: "The channel"
+                    enum: 
+                      - whatsapp
+                    example: whatsapp
+                  to:
+                    $ref: '#/components/schemas/To'
+                  template:
+                    type: string
+                    example: abc:123:verify
+                required:
+                  - channel
+                  - to
+              example: [
+                  {
+                    "channel": "whatsapp_interactive",
                     "to": "447700900000"
                   }
                 ]
@@ -367,7 +417,7 @@ components:
 
     ClientRef:
       type: string
-      description: If the `client-ref` is set when the request is sent, it will be included in the callbacks
+      description: If the `client_ref` is set when the request is sent, it will be included in the callbacks
       example: my-personal-reference
 
     Brand:
@@ -385,6 +435,8 @@ components:
         - request_id
         - submitted_at
         - status
+        - finalized_at
+        - channel_timeout
         - workflow
       properties:
         request_id:
@@ -404,8 +456,8 @@ components:
             - expired
         channel_timeout:
           type: integer
-          description: >-
-            The number of seconds before the current step in the verification request times out.
+          description: The number of seconds before the current step in the verification request times out.
+          example: 300
         workflow:
           type: array
           items:
@@ -417,6 +469,7 @@ components:
                 enum: 
                   - sms
                   - whatsapp
+                  - whatsapp_interactive
                   - voice
               initiated_at:
                 type: string
@@ -431,7 +484,6 @@ components:
                   - completed
                   - failed
                   - expired
-                  - cancelled
           example: [
             {
               "channel": "sms",
@@ -486,6 +538,50 @@ components:
         #         description: The date and time that the event was started, in ISO 8601 format.
         #         example: "2020-01-01T14:00:00.000Z"
 
+    VerifyResourceWhatsappInteractive:
+      required:
+        - request_id
+        - triggered_at 
+        - type
+        - channel
+        - status
+        - finalized_at
+        - channel_timeout
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestId'
+        triggered_at:
+          type: string
+          description: >-
+            The date and time the verification request was triggered, in ISO 8601 format.
+          example: "2020-01-01T14:00:00.000Z"
+        type:
+          type: string
+          description: Type of response
+          example: "event"
+        channel_timeout:
+          type: integer
+          description: The number of seconds before the current step in the verification request times out.
+          example: 300
+        channel: 
+          type: string
+          description: The channel
+          example: "whatsapp-interactive"
+        status:
+          type: string
+          description: Current status of this request
+          example: completed
+          enum:
+            - completed
+            - failed
+            - not_approved
+            - rejected
+        finalized_at:
+          type: string
+          description: >-
+            The date and time the verification request was completed. This
+            response parameter is in ISO 8601 format.
+          example: "2020-01-01T14:00:00.000Z"
 
     code:
       type: string
