@@ -1,7 +1,7 @@
 openapi: 3.0.2
 info:
   title: Vonage Verify API (v2)
-  version: 0.0.7
+  version: 0.0.8
   description: Verify API provides a choice of routes for sending a code to a user. You can use this to confirm a user's contact information, as a second factor when authenticating users, or for step-up authentication.
   contact:
     name: Vonage DevRel
@@ -325,8 +325,8 @@ components:
                     type: string
                     description: "The channel"
                     enum: 
-                      - whatsapp
-                    example: whatsapp
+                      - whatsapp_interactive
+                    example: whatsapp_interactive
                   to:
                     $ref: '#/components/schemas/To'
                   template:
