@@ -1,7 +1,7 @@
 ---
 openapi: 3.0.0
 info:
-  version: 1.3.8
+  version: 1.3.9
   title: Voice API
   description:
     The Voice API lets you create outbound calls, control in-progress calls
@@ -356,7 +356,7 @@ components:
           description: Set the audio level of the stream in the range `-1 >= level <= 1` with a precision of 0.1. The default value is 0.
           example: "0.4"
           default: "0"
-    
+
     RequestTransferActionParam:
       description: Transfer the call to a new NCCO
       type: string
@@ -372,8 +372,8 @@ components:
         - action
         - destination
       properties:
-        action: 
-          $ref: "#/components/schemas/RequestTransferActionParam" 
+        action:
+          $ref: "#/components/schemas/RequestTransferActionParam"
         destination:
           type: object
           required:
@@ -401,7 +401,7 @@ components:
         - destination
       properties:
         action:
-          $ref: "#/components/schemas/RequestTransferActionParam" 
+          $ref: "#/components/schemas/RequestTransferActionParam"
         destination:
           type: object
           required:
@@ -529,7 +529,7 @@ components:
               - "$ref": "#/components/schemas/EndpointVBCExtension"
         from:
           "$ref": "#/components/schemas/EndpointPhoneFrom"
-          
+
         random_from_number:
           description: "Set to `true` to use random phone number as `from`. The number will be selected from the list of the numbers assigned to the current application. `random_from_number: true` cannot be used together with `from`."
           type: boolean
@@ -977,7 +977,7 @@ components:
       description: The vocal style (vocal range, tessitura, and timbre) to use
       type: integer
       default: 0
-      
+
     voice_name:
       description: <strong>DEPRECATED</strong> The voice & language to use
       type: string
