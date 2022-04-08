@@ -1,7 +1,7 @@
 openapi: 3.0.2
 info:
   title: Vonage Verify API (v2)
-  version: 0.0.9
+  version: 0.0.10
   description: Verify API provides a choice of routes for sending a code to a user. You can use this to confirm a user's contact information, as a second factor when authenticating users, or for step-up authentication.
   contact:
     name: Vonage DevRel
@@ -12,6 +12,11 @@ servers:
 security:
   - basicAuth: []
   - bearerAuth: []
+tags:
+  - name: Requests
+    description: Verify Requests
+  - name: Velocity Rules
+    description: Velocity Rules
 
 paths:
   /:
@@ -19,6 +24,8 @@ paths:
       operationId: newRequest
       summary: Request a verification be sent to a user
       description: Start verifying that we can reach this user given a set of contact details
+      tags:
+        - Requests
       requestBody:
         $ref: '#/components/requestBodies/NewVerificationRequest'
       responses:
@@ -86,6 +93,8 @@ paths:
       operationId: checkCode
       summary: Check a supplied code against a request to see if it is valid
       description: Allows a code to be checked against an existing Verification request
+      tags:
+        - Requests
       requestBody:
         $ref: '#/components/requestBodies/CheckCodeRequest'
 
@@ -138,6 +147,30 @@ paths:
     #         application/json:
     #           schema:
     #             $ref: "#/components/schemas/ErrorThrottled"
+
+  /network-unblock/{network_code}:
+    parameters:
+      - $ref: '#/components/parameters/network_code'
+    post:
+      operationId: networkUnblock
+      summary: Request a network unblock
+      description: Request to unblock a network that was previous unblocked due to potential fraud detection
+      tags:
+        - Velocity Rules
+      responses:
+        "202":
+          description: Accepted.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+        "429":
+          description: "Rate Limited"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorThrottled"
 
 x-webhooks:
   request-status-update:
@@ -202,6 +235,13 @@ components:
       in: path
       required: true
       description: ID of the verify request
+      schema:
+        type: string
+    network_code:
+      name: network_code
+      in: path
+      required: true
+      description: Network code to unblock
       schema:
         type: string
 
