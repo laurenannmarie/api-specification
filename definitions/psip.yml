@@ -17,7 +17,7 @@ paths:
       tags:
         - Domains
       security:
-        - bearerAuth: []
+        - basicAuth: []
       summary: Create a PSIP domain
       description: Create a new PSIP domain
       operationId: createDomain
@@ -44,7 +44,7 @@ paths:
       tags:
         - Domains
       security:
-        - bearerAuth: []
+        - basicAuth: []
       summary: Get details of your PSIP domain
       description: Get details of your PSIP domain
       operationId: getDomain
@@ -71,7 +71,7 @@ paths:
       tags:
         - Domains
       security:
-        - bearerAuth: []
+        - basicAuth: []
       summary: Create or update a PSIP domain
       description: Create or update a PSIP domain
       operationId: createUpdateDomain
@@ -104,7 +104,7 @@ paths:
       tags:
         - Domains
       security:
-        - bearerAuth: []
+        - basicAuth: []
       summary: Delete PSIP domain
       description: Delete a PSIP domain
       operationId: deleteDomain
@@ -124,10 +124,9 @@ paths:
 
 components:
   securitySchemes:
-    bearerAuth:
+    basicAuth:
       type: http
-      scheme: bearer
-      bearerFormat: JWT
+      scheme: basic
   
   schemas:
     name:
@@ -166,16 +165,15 @@ components:
       maxItems: 16
       description: Access Control List of IPs that can make calls to domain. Can use CIDR notation to facilitate inclusion of IP ranges.
       items:
-        $ref: "#/components/schemas/aclItem"
-    
-    aclItem:
-      title: ACL Item
-      type: string
-      example: "50.127.127.0/29"
+        type: string
+      example: ["50.127.127.0", "127.0.0.1"]
               
     DomainObject:
       title: Domain
       type: object
+      required:
+        - name
+        - application_id
       properties:
         name:
           $ref: "#/components/schemas/name"
