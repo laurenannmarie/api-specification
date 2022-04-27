@@ -166,7 +166,7 @@ components:
       description: Access Control List of IPs that can make calls to domain. Can use CIDR notation to facilitate inclusion of IP ranges.
       items:
         type: string
-      example: ["50.127.127.0", "127.0.0.1"]
+      example: ["50.127.127.0/29", "192.168.0.1"]
               
     DomainObject:
       title: Domain
