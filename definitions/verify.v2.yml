@@ -15,8 +15,6 @@ security:
 tags:
   - name: Requests
     description: Verify Requests
-  - name: Velocity Rules
-    description: Velocity Rules
 
 paths:
   /:
@@ -40,25 +38,12 @@ paths:
                 properties:
                   request_id:
                     $ref: '#/components/schemas/RequestId'
-        "404":
-          description: The request could not be found
+        "422":
+          description: Invalid parameters
           content:
             application/json:
               schema:
-                allOf:
-                  - $ref: '#/components/schemas/Error'
-                  - type: object
-                    description: Invalid Request
-                    properties:
-                      title:
-                        description: Generic error message
-                        example: There was a problem with your submission
-                      type:
-                        description: Link to error / remediation options
-                        example: 'https://developer.vonage.com/api-errors/verify#invalid-parameters'
-                      detail:
-                        description: Additional information about the error
-                        example: Missing required field `workflow`
+                $ref: '#/components/schemas/ErrorInvalidParams'
         "429":
           description: "Rate Limited"
           content:
@@ -159,30 +144,6 @@ paths:
     #         application/json:
     #           schema:
     #             $ref: "#/components/schemas/ErrorThrottled"
-
-  /network-unblock/{network_code}:
-    parameters:
-      - $ref: '#/components/parameters/network_code'
-    post:
-      operationId: networkUnblock
-      summary: Request a network unblock
-      description: Request to unblock a network that was previous unblocked due to potential fraud detection
-      tags:
-        - Velocity Rules
-      responses:
-        "202":
-          description: Accepted.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties: {}
-        "429":
-          description: "Rate Limited"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorThrottled"
 
 x-webhooks:
   request-status-update:
@@ -540,7 +501,7 @@ components:
                   - completed
                   - failed
                   - expired
-                  - not_approved
+                  - user_rejected
           example: [
             {
               "channel": "sms",
@@ -627,7 +588,7 @@ components:
           enum:
             - completed
             - failed
-            - not_approved
+            - user_rejected
             - rejected
         finalized_at:
           type: string
@@ -753,6 +714,32 @@ components:
           type: string
           example: "xxx"
           description: The instance ID
+    
+    ErrorInvalidParams:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Error title
+          example: Invalid params
+        detail:
+          type: string
+          description: More detailed error descriptions
+          example: The value of one or more parameters is invalid
+        instance:
+          type: string
+          description: GUID reference for the instance
+          example: 06032957-99ce-41ee-978b-9a390cd5a89b
+        type:
+          type: string
+          description: Link to error / remediation options
+          example: https://www.nexmo.com/messages/Errors#InvalidParams
+        invalid_parameters:
+          type: array
+          description: Detailed array of errors``
+          example:
+            name: brand
+            reason: Brand is required
 
     ErrorThrottled:
       type: object
