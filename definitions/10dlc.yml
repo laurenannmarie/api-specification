@@ -1,7 +1,7 @@
 openapi: 3.0.3
 
 info:
-  version: 1.0.1
+  version: 1.0.2
   title: 10DLC Brand and Campaign Provisioning
   contact:
     name: Vonage
@@ -231,10 +231,9 @@ paths:
         "429":
           $ref: "common/common_errors.yml#/components/responses/ThrottledError"
 
-  /v1/10dlc/brands/{brand_id}/vetting/requests/{vetting_request_id}:
+  /v1/10dlc/brands/{brand_id}/vetting/requests/:
     parameters:
       - $ref: "#/components/parameters/BrandId"
-      - $ref: "#/components/parameters/VettingRequestId"
     put:
       tags:
         - Brands
@@ -1453,17 +1452,18 @@ components:
                   - CV
                   - WMC
                 example: "abcd123"
-              vetting_class:
-                description: Type of vetting to perform.
-                type: string
-                example: "abcd123"
               vetting_token:
                 description: Type of vetting to perform. Not required for all vetting providers.
+                type: string
+                example: "abcd123"
+              vetting_id:
+                description: Unique ID that identifies a vetting transaction performed by a vetting provider. This ID is provided by the vetting provider at time of vetting.
                 type: string
                 example: "abcd123"
             required:
               - evp_id
               - vetting_class
+              - vetting_id
 
     UpdateBrand:
       required: true
@@ -2671,7 +2671,6 @@ components:
       required: true
       schema:
         $ref: "#/components/schemas/VettingRequestId"
-
 tags:
   - name: Brands
     description: APIs relating to working with Brands
