@@ -1,0 +1,35 @@
+openapi: 3.0.3
+info:
+  version: 0.0.1
+  title: Fraud API
+  contact:
+    name: Vonage
+    url: https://developer.nexmo.com
+    email: devrel@vonage.com
+  description: APIs relating to fraud
+
+servers:
+  - url: https://api.nexmo.com/v0.1/fraud
+
+paths:
+  /:
+    post:
+      security:
+        - bearerAuth: []
+        - basicAuth: []
+      description: Perform a fraud request
+      summary: Perform a fraud request.
+      operationId: FraudRequest
+      requestBody:
+        description: Perform a fraud request.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                number:
+                  type: string
+      responses:
+        '200':
+          description: "OK"
