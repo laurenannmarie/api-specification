@@ -1,7 +1,7 @@
 openapi: 3.0.3
 
 info:
-  version: 1.0.2
+  version: 1.0.3
   title: 10DLC Brand and Campaign Provisioning
   contact:
     name: Vonage
@@ -1453,7 +1453,7 @@ components:
                   - WMC
                 example: "abcd123"
               vetting_token:
-                description: Type of vetting to perform. Not required for all vetting providers.
+                description: Token verifying the vetting ID (only applicable to Aegis vetting).
                 type: string
                 example: "abcd123"
               vetting_id:
