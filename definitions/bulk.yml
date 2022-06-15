@@ -1,0 +1,50 @@
+openapi: 3.0.0
+info:
+  title: Vonage Bulk API
+  version: 0.1.0
+  x-label: Alpha
+servers:
+  - url: https://api-eu.vonage.com/v0.1/bulk
+paths:
+  /test:
+    get:
+      summary: testing
+      operationId: test
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                properties:
+                  page_size:
+                    type: integer
+                    example: 10
+                    description: The number of results returned on this page.
+                  _links:
+                    type: object
+                    properties:
+                      first:
+                        type: object
+                        properties:
+                          href:
+                            type: string
+                            example: 'https://api-eu.vonage.com/v0.1/bulk/test?page_size=10'
+                      self:
+                        type: object
+                        properties:
+                          href:
+                            type: string
+                            example: 'https://api-eu.vonage.com/v0.1/bulk/test?page_size=10&start_id=20'
+                      next:
+                        type: object
+                        properties:
+                          href:
+                            type: string
+                            example: 'https://api-eu.vonage.com/v0.1/bulk/test?page_size=10&start_id=30'
+                      prev:
+                        type: object
+                        properties:
+                          href:
+                            type: string
+                            example: 'https://api-eu.vonage.com/v0.1/bulk/test?page_size=10&end_id=20'
