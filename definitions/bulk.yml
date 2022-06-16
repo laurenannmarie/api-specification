@@ -1,8 +1,8 @@
 openapi: 3.0.0
 info:
   title: Vonage Bulk API
-  version: 0.1.0
-  x-label: Alpha
+  version: 0.1
+  x-label: Alpha 2 
 servers:
   - url: https://api-eu.vonage.com/v0.1/bulk
 paths:
