@@ -1,50 +1,1834 @@
 openapi: 3.0.0
 info:
   title: Vonage Bulk API
+  description: REST APIs for VCP Bulk Jobs & Lists
   version: 0.1.0
+  contact:
+    name: Nexmo.com
+    email: devrel@nexmo.com
+    url: "https://developer.nexmo.com/"
+    x-twitter: Nexmo
+  termsOfService: "https://www.nexmo.com/terms-of-use"
+  license:
+    name: The MIT License (MIT)
+    url: "https://opensource.org/licenses/MIT"
+  x-logo:
+    url: "https://twitter.com/Nexmo/profile_image?size=original"
+  x-apiClientRegistration: "https://dashboard.nexmo.com/sign-up"
   x-label: Alpha
 servers:
+  - url: https://api-eu.dev.v1.vonagenetworks.net/v0.1/bulk
+    description: dev env in EU geo
   - url: https://api-eu.vonage.com/v0.1/bulk
+    description: prod env in EU geo
+tags: [ ]
 paths:
-  /test:
-    get:
-      summary: testing
-      operationId: test
+  /lists:
+    post:
+      operationId: createList
+      summary: Create list
+      parameters: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateListDto'
       responses:
-        '200':
-          description: OK
+        '201':
+          description: ''
           content:
             application/json:
               schema:
-                properties:
-                  page_size:
-                    type: integer
-                    example: 10
-                    description: The number of results returned on this page.
-                  _links:
-                    type: object
-                    properties:
-                      first:
+                $ref: '#/components/schemas/ListDto'
+      tags:
+        - lists
+    get:
+      operationId: findAllLists
+      summary: Find all lists
+      parameters:
+        - required: false
+          name: page
+          in: query
+          schema:
+            minimum: 1
+            default: 1
+            type: number
+        - name: page_size
+          required: false
+          in: query
+          schema:
+            minimum: 1
+            maximum: 1000
+            default: 100
+            type: number
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PageResponseDto'
+                  - properties:
+                      _embedded:
                         type: object
+                        readOnly: true
                         properties:
-                          href:
-                            type: string
-                            example: 'https://api-eu.vonage.com/v0.1/bulk/test?page_size=10'
-                      self:
+                          lists:
+                            type: array
+                            readOnly: true
+                            items:
+                              $ref: '#/components/schemas/ListDto'
+      tags:
+        - lists
+  /lists/{id}:
+    get:
+      operationId: getList
+      summary: Get list by id
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListDto'
+      tags:
+        - lists
+    put:
+      operationId: updateList
+      summary: Update list
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateListDto'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListDto'
+      tags:
+        - lists
+    delete:
+      operationId: deleteList
+      summary: Delete list
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+      tags:
+        - lists
+  /lists/{id}/reset:
+    post:
+      operationId: resetList
+      summary: Reset list - delete all items
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+      tags:
+        - lists
+  /lists/{id}/refresh:
+    post:
+      operationId: refreshList
+      summary: >-
+        Refresh list - delete all items and sync from the datasource. Refresh is
+        invalid for manual list
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+      tags:
+        - lists
+  /lists/{listId}/items:
+    post:
+      operationId: createListItem
+      summary: Create list item
+      parameters:
+        - name: listId
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateListItemDto'
+      responses:
+        '201':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListItemDto'
+      tags:
+        - lists
+        - items
+    get:
+      operationId: listItems
+      summary: Iterate over list items
+      parameters:
+        - name: listId
+          required: true
+          in: path
+          schema:
+            type: string
+        - required: false
+          name: page
+          in: query
+          schema:
+            minimum: 1
+            default: 1
+            type: number
+        - name: page_size
+          required: false
+          in: query
+          schema:
+            minimum: 1
+            maximum: 1000
+            default: 100
+            type: number
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PageResponseDto'
+                  - properties:
+                      _embedded:
                         type: object
+                        readOnly: true
                         properties:
-                          href:
-                            type: string
-                            example: 'https://api-eu.vonage.com/v0.1/bulk/test?page_size=10&start_id=20'
-                      next:
+                          items:
+                            type: array
+                            readOnly: true
+                            items:
+                              $ref: '#/components/schemas/ListItemDto'
+      tags:
+        - lists
+        - items
+  /lists/{listId}/items/{itemId}:
+    get:
+      operationId: getListItem
+      summary: Get list item by id
+      parameters:
+        - name: listId
+          required: true
+          in: path
+          schema:
+            type: string
+        - name: itemId
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListItemDto'
+      tags:
+        - lists
+        - items
+    put:
+      operationId: updateListItem
+      summary: Update list item
+      parameters:
+        - name: listId
+          required: true
+          in: path
+          schema:
+            type: string
+        - name: itemId
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateListItemDto'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListItemDto'
+      tags:
+        - lists
+        - items
+    delete:
+      operationId: deleteListItem
+      summary: Delete list item
+      parameters:
+        - name: listId
+          required: true
+          in: path
+          schema:
+            type: string
+        - name: itemId
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+      tags:
+        - lists
+        - items
+  /lists/{listId}/items/import:
+    post:
+      operationId: importItems
+      summary: Import list items
+      parameters:
+        - name: listId
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+      tags:
+        - lists
+        - items
+  /actions:
+    post:
+      operationId: createAction
+      summary: Create action_call
+      parameters: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateActionDto'
+      responses:
+        '201':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActionDto'
+      tags:
+        - actions
+    get:
+      operationId: findAllActions
+      summary: Find all actions
+      parameters:
+        - required: false
+          name: page
+          in: query
+          schema:
+            minimum: 1
+            default: 1
+            type: number
+        - name: page_size
+          required: false
+          in: query
+          schema:
+            minimum: 1
+            maximum: 1000
+            default: 100
+            type: number
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PageResponseDto'
+                  - properties:
+                      _embedded:
                         type: object
+                        readOnly: true
                         properties:
-                          href:
-                            type: string
-                            example: 'https://api-eu.vonage.com/v0.1/bulk/test?page_size=10&start_id=30'
-                      prev:
+                          actions:
+                            type: array
+                            readOnly: true
+                            items:
+                              $ref: '#/components/schemas/ActionDto'
+      tags:
+        - actions
+  /actions/{id}:
+    get:
+      operationId: getAction
+      summary: Get action by id
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActionDto'
+      tags:
+        - actions
+    put:
+      operationId: updateAction
+      summary: Update action_call
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateActionDto'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActionDto'
+      tags:
+        - actions
+    delete:
+      operationId: deleteAction
+      summary: Delete action_call
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActionDto'
+      tags:
+        - actions
+  /jobs:
+    post:
+      operationId: createJob
+      summary: Create job
+      parameters: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateJobDto'
+      responses:
+        '201':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobDto'
+      tags:
+        - jobs
+    get:
+      operationId: findAllJobs
+      summary: Find all jobs
+      parameters:
+        - required: false
+          name: page
+          in: query
+          schema:
+            minimum: 1
+            default: 1
+            type: number
+        - name: page_size
+          required: false
+          in: query
+          schema:
+            minimum: 1
+            maximum: 1000
+            default: 100
+            type: number
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PageResponseDto'
+                  - properties:
+                      _embedded:
                         type: object
+                        readOnly: true
                         properties:
-                          href:
-                            type: string
-                            example: 'https://api-eu.vonage.com/v0.1/bulk/test?page_size=10&end_id=20'
+                          jobs:
+                            type: array
+                            readOnly: true
+                            items:
+                              $ref: '#/components/schemas/JobDto'
+      tags:
+        - jobs
+  /jobs/{id}:
+    get:
+      operationId: getJob
+      summary: Get job by id
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobDto'
+      tags:
+        - jobs
+    put:
+      operationId: updateJob
+      summary: Update job
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateJobDto'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobDto'
+      tags:
+        - jobs
+    delete:
+      operationId: deleteJob
+      summary: Delete job
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+      tags:
+        - jobs
+  /events:
+    get:
+      operationId: findEventsAll
+      summary: Get events
+      parameters:
+        - required: false
+          name: page
+          in: query
+          schema:
+            minimum: 1
+            default: 1
+            type: number
+        - name: page_size
+          required: false
+          in: query
+          schema:
+            minimum: 1
+            maximum: 1000
+            default: 100
+            type: number
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PageResponseDto'
+                  - properties:
+                      _embedded:
+                        type: object
+                        readOnly: true
+                        properties:
+                          events:
+                            type: array
+                            readOnly: true
+                            items:
+                              oneOf:
+                                - $ref: >-
+                                    #/components/schemas/ActionCallSucceededEvent
+                                - $ref: '#/components/schemas/ActionCallFailedEvent'
+                                - $ref: '#/components/schemas/ActionCallInfoEvent'
+                                - $ref: '#/components/schemas/RecipientResponseEvent'
+      tags:
+        - events
+  /runs:
+    post:
+      operationId: scheduleAtRun
+      summary: Start job
+      parameters: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateJobRunDto'
+      responses:
+        '202':
+          description: ''
+      tags:
+        - runs
+    get:
+      operationId: findAllRuns
+      summary: Find all runs
+      parameters:
+        - required: false
+          name: page
+          in: query
+          schema:
+            minimum: 1
+            default: 1
+            type: number
+        - name: page_size
+          required: false
+          in: query
+          schema:
+            minimum: 1
+            maximum: 1000
+            default: 100
+            type: number
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PageResponseDto'
+                  - properties:
+                      _embedded:
+                        type: object
+                        readOnly: true
+                        properties:
+                          runs:
+                            type: array
+                            readOnly: true
+                            items:
+                              $ref: '#/components/schemas/ActionDto'
+      tags:
+        - runs
+  /runs/{id}/stop:
+    post:
+      operationId: stopJobRun
+      summary: Initiate run stop
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '202':
+          description: ''
+      tags:
+        - runs
+  /runs/{id}:
+    get:
+      operationId: getJobRun
+      summary: Get job run by id
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobRunDto'
+      tags:
+        - runs
+  /runs/{id}/events:
+    get:
+      operationId: findEventsAllRun
+      summary: Get job run events
+      parameters:
+        - required: false
+          name: page
+          in: query
+          schema:
+            minimum: 1
+            default: 1
+            type: number
+        - name: page_size
+          required: false
+          in: query
+          schema:
+            minimum: 1
+            maximum: 1000
+            default: 100
+            type: number
+        - name: id
+          required: true
+          in: path
+          schema: { }
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PageResponseDto'
+                  - properties:
+                      _embedded:
+                        type: object
+                        readOnly: true
+                        properties:
+                          events:
+                            type: array
+                            readOnly: true
+                            items:
+                              oneOf:
+                                - $ref: >-
+                                    #/components/schemas/ActionCallSucceededEvent
+                                - $ref: '#/components/schemas/ActionCallFailedEvent'
+                                - $ref: '#/components/schemas/ActionCallInfoEvent'
+                                - $ref: '#/components/schemas/RecipientResponseEvent'
+      tags:
+        - runs
+  /runs/{id}/summary:
+    get:
+      operationId: getTotalStats
+      summary: Get action runs and recipient responses statistics overview
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema: { }
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatsRunSummaryDto'
+      tags:
+        - runs
+  /webhooks/actions/status:
+    post:
+      operationId: actionStatus
+      summary: Webhook endpoint to handle action call status for async actions
+      parameters: [ ]
+      responses:
+        '200':
+          description: ''
+      tags:
+        - webhooks
+      security:
+        - NA: [ ]
+  /webhooks/recipients/responses:
+    post:
+      operationId: recipientResponse
+      summary: Webhook endpoint to handle recipient responses
+      parameters: [ ]
+      responses:
+        '200':
+          description: ''
+      tags:
+        - webhooks
+      security:
+        - NA: [ ]
+components:
+  securitySchemes:
+    bearerAuth:
+      scheme: bearer
+      bearerFormat: JWT
+      type: http
+      name: Authorization
+      in: header
+  schemas:
+    PageQueryDto:
+      type: object
+      properties:
+        page:
+          type: number
+          minimum: 1
+          default: 1
+        page_size:
+          type: number
+          minimum: 1
+          maximum: 1000
+          default: 100
+    Href:
+      type: object
+      properties:
+        href:
+          type: string
+          format: url
+      required:
+        - href
+    HalLinks:
+      type: object
+      properties:
+        first:
+          $ref: '#/components/schemas/Href'
+        prev:
+          $ref: '#/components/schemas/Href'
+        self:
+          $ref: '#/components/schemas/Href'
+        next:
+          $ref: '#/components/schemas/Href'
+      required:
+        - first
+        - prev
+        - self
+        - next
+    PageResponseDto:
+      type: object
+      properties:
+        total_items:
+          type: number
+          readOnly: true
+        total_pages:
+          type: number
+          readOnly: true
+        page:
+          type: number
+          readOnly: true
+          minimum: 1
+        page_size:
+          type: number
+          readOnly: true
+        _links:
+          readOnly: true
+          type: array
+          items:
+            $ref: '#/components/schemas/HalLinks'
+        _embedded:
+          type: object
+          additionalProperties: true
+          readOnly: true
+      required:
+        - total_items
+        - total_pages
+        - page
+        - page_size
+        - _links
+        - _embedded
+    ListLabelDto:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 50
+        alias:
+          type: string
+          maxLength: 50
+        key:
+          type: object
+          default: false
+      required:
+        - name
+    ListDto:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+          format: uuid
+        created_at:
+          format: date-time
+          type: string
+          readOnly: true
+        updated_at:
+          format: date-time
+          type: string
+          readOnly: true
+        name:
+          type: string
+        description:
+          type: string
+          maxLength: 1024
+        tags:
+          minItems: 0
+          maxItems: 10
+          type: array
+          items:
+            type: string
+        labels:
+          minItems: 0
+          maxItems: 50
+          type: array
+          items:
+            $ref: '#/components/schemas/ListLabelDto'
+        items_count:
+          type: number
+          readOnly: true
+        datasource:
+          discriminator:
+            propertyName: type
+          oneOf:
+            - $ref: '#/components/schemas/SalesforceDatasource'
+        sync_status:
+          type: string
+          readOnly: true
+          enum:
+            - configured
+            - syncing
+            - resetting
+            - refreshing
+            - paused
+            - stopped
+            - completed
+            - failed
+        type:
+          type: string
+          readOnly: true
+          enum:
+            - salesforce
+            - manual
+      required:
+        - id
+        - created_at
+        - updated_at
+        - name
+        - items_count
+        - sync_status
+        - type
+    CreateListDto:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+          maxLength: 1024
+        tags:
+          minItems: 0
+          maxItems: 10
+          type: array
+          items:
+            type: string
+        labels:
+          minItems: 0
+          maxItems: 50
+          type: array
+          items:
+            $ref: '#/components/schemas/ListLabelDto'
+        datasource:
+          discriminator:
+            propertyName: type
+          oneOf:
+            - $ref: '#/components/schemas/SalesforceDatasource'
+        type:
+          type: string
+          readOnly: true
+          enum:
+            - salesforce
+            - manual
+      required:
+        - name
+        - type
+    UpdateListDto:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+          maxLength: 1024
+        tags:
+          minItems: 0
+          maxItems: 10
+          type: array
+          items:
+            type: string
+        labels:
+          minItems: 0
+          maxItems: 50
+          type: array
+          items:
+            $ref: '#/components/schemas/ListLabelDto'
+        datasource:
+          discriminator:
+            propertyName: type
+          oneOf:
+            - $ref: '#/components/schemas/SalesforceDatasource'
+        type:
+          type: string
+          readOnly: true
+          enum:
+            - salesforce
+            - manual
+    ListDatasourceBaseDto:
+      type: object
+      properties:
+        type:
+          type: string
+          default: salesforce
+          enum:
+            - salesforce
+      required:
+        - type
+    SalesforceDatasource:
+      type: object
+      properties:
+        type:
+          type: string
+          default: salesforce
+          enum:
+            - salesforce
+        integration_id:
+          type: string
+        soql:
+          type: string
+      required:
+        - type
+        - integration_id
+        - soql
+    ListItemDto:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+          format: uuid
+        created_at:
+          format: date-time
+          type: string
+          readOnly: true
+        updated_at:
+          format: date-time
+          type: string
+          readOnly: true
+        list_id:
+          type: string
+          readOnly: true
+          format: uuid
+        data:
+          type: object
+          additionalProperties: true
+          minProperties: 1
+          maxProperties: 20
+      required:
+        - id
+        - created_at
+        - updated_at
+        - list_id
+        - data
+    ApiChangedDto:
+      type: object
+      properties:
+        inserted:
+          type: number
+        updated:
+          type: number
+        deleted:
+          type: number
+    CreateListItemDto:
+      type: object
+      properties:
+        data:
+          type: object
+          additionalProperties: true
+          minProperties: 1
+          maxProperties: 20
+      required:
+        - data
+    UpdateListItemDto:
+      type: object
+      properties:
+        data:
+          type: object
+          additionalProperties: true
+          minProperties: 1
+          maxProperties: 20
+    ActionParameterDefinitionDto:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - string
+            - secret
+          default: string
+        name:
+          type: string
+        required:
+          type: boolean
+          default: true
+        default:
+          type: string
+      required:
+        - type
+        - name
+        - required
+    CreateActionDto:
+      type: object
+      properties:
+        name:
+          type: string
+        parameters:
+          type: array
+          items:
+            $ref: '#/components/schemas/ActionParameterDefinitionDto'
+        command:
+          discriminator:
+            propertyName: type
+          oneOf:
+            - $ref: '#/components/schemas/HttpApiInvokeDto'
+        timeout_seconds:
+          type: number
+          default: 5
+          minimum: 0
+          maximum: 60
+      required:
+        - name
+        - command
+    ActionParameterValueDto:
+      type: object
+      properties:
+        name:
+          type: string
+        value:
+          type: string
+      required:
+        - name
+        - value
+    ActionHttpResponseSuccessDto:
+      type: object
+      properties:
+        codes:
+          default:
+            - '200'
+          type: array
+          items:
+            type: string
+      required:
+        - codes
+    ActionHttpErrorDto:
+      type: object
+      properties:
+        code:
+          type: string
+        details:
+          type: string
+      required:
+        - details
+    ActionHttpResponseDto:
+      type: object
+      properties:
+        invocation_id:
+          type: string
+        success:
+          $ref: '#/components/schemas/ActionHttpResponseSuccessDto'
+        error:
+          $ref: '#/components/schemas/ActionHttpErrorDto'
+    ActionHttpAsyncStatusValuesDto:
+      type: object
+      properties:
+        values:
+          minItems: 1
+          maxItems: 10
+          type: array
+          items:
+            type: array
+      required:
+        - values
+    ActionHttpAsyncErrorStatusDto:
+      type: object
+      properties:
+        values:
+          minItems: 1
+          maxItems: 10
+          type: array
+          items:
+            type: array
+        details:
+          type: string
+      required:
+        - values
+        - details
+    ActionHttpAsyncStatusDto:
+      type: object
+      properties:
+        value:
+          type: string
+        success:
+          $ref: '#/components/schemas/ActionHttpAsyncStatusValuesDto'
+        error:
+          $ref: '#/components/schemas/ActionHttpAsyncErrorStatusDto'
+        info:
+          $ref: '#/components/schemas/ActionHttpAsyncStatusValuesDto'
+      required:
+        - value
+        - success
+    ActionHttpAsyncDto:
+      type: object
+      properties:
+        invocation_id:
+          type: string
+        status:
+          $ref: '#/components/schemas/ActionHttpAsyncStatusDto'
+      required:
+        - invocation_id
+        - status
+    HttpApiInvokeDto:
+      type: object
+      properties:
+        type:
+          type: string
+          default: http-api-invoke
+          enum:
+            - http-api-invoke
+        url:
+          type: string
+        method:
+          type: string
+          default: post
+        headers:
+          type: array
+          items:
+            $ref: '#/components/schemas/ActionParameterValueDto'
+        payload:
+          type: object
+        response:
+          $ref: '#/components/schemas/ActionHttpResponseDto'
+        async:
+          $ref: '#/components/schemas/ActionHttpAsyncDto'
+      required:
+        - type
+        - url
+        - method
+    ActionDto:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+          format: uuid
+        created_at:
+          format: date-time
+          type: string
+          readOnly: true
+        updated_at:
+          format: date-time
+          type: string
+          readOnly: true
+        name:
+          type: string
+        parameters:
+          type: array
+          items:
+            $ref: '#/components/schemas/ActionParameterDefinitionDto'
+        command:
+          discriminator:
+            propertyName: type
+          oneOf:
+            - $ref: '#/components/schemas/HttpApiInvokeDto'
+        timeout_seconds:
+          type: number
+          default: 5
+          minimum: 0
+          maximum: 60
+      required:
+        - id
+        - created_at
+        - updated_at
+        - name
+        - command
+    UpdateActionDto:
+      type: object
+      properties:
+        name:
+          type: string
+        parameters:
+          type: array
+          items:
+            $ref: '#/components/schemas/ActionParameterDefinitionDto'
+        command:
+          discriminator:
+            propertyName: type
+          oneOf:
+            - $ref: '#/components/schemas/HttpApiInvokeDto'
+        timeout_seconds:
+          type: number
+          default: 5
+          minimum: 0
+          maximum: 60
+    ListRefDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: c4fd1c9e-80e7-4db1-94cb-8ec0edc154a4
+        type:
+          type: string
+          enum:
+            - list
+      required:
+        - id
+        - type
+    RecipientsDto:
+      type: object
+      properties:
+        include:
+          minItems: 1
+          maxItems: 10
+          type: array
+          items:
+            $ref: '#/components/schemas/ListRefDto'
+        exclude:
+          minItems: 1
+          maxItems: 10
+          type: array
+          items:
+            $ref: '#/components/schemas/ListRefDto'
+      required:
+        - include
+    ExpressionDto:
+      type: object
+      properties:
+        expression:
+          type: object
+          maxLength: 256
+      required:
+        - expression
+    ActionRefDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: c4fd1c9e-80e7-4db1-94cb-8ec0edc154a4
+        type:
+          type: string
+          enum:
+            - action
+      required:
+        - id
+        - type
+    ActionCallDto:
+      type: object
+      properties:
+        action_ref:
+          $ref: '#/components/schemas/ActionRefDto'
+        parameters:
+          maxItems: 20
+          type: array
+          items:
+            $ref: '#/components/schemas/ActionParameterValueDto'
+      required:
+        - action_ref
+    MessageTemplateDto:
+      type: object
+      properties:
+        type:
+          type: string
+          default: text
+        message:
+          type: object
+          maxLength: 8112
+          default: ''
+        encoding:
+          type: string
+          default: utf8
+          enum:
+            - utf8
+      required:
+        - message
+    RecipientCorrelationDto:
+      type: object
+      properties:
+        correlation_id:
+          type: string
+      required:
+        - correlation_id
+    SegmentationDto:
+      type: object
+      properties:
+        condition:
+          $ref: '#/components/schemas/ExpressionDto'
+        action_call:
+          $ref: '#/components/schemas/ActionCallDto'
+        name:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+          maxLength: 1024
+        template:
+          $ref: '#/components/schemas/MessageTemplateDto'
+        recipient:
+          $ref: '#/components/schemas/RecipientCorrelationDto'
+      required:
+        - condition
+        - action_call
+        - recipient
+    EventMatcherDto:
+      type: object
+      properties:
+        condition:
+          $ref: '#/components/schemas/ExpressionDto'
+        action_call:
+          $ref: '#/components/schemas/ActionCallDto'
+        name:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+          maxLength: 1024
+        recipient:
+          $ref: '#/components/schemas/RecipientCorrelationDto'
+      required:
+        - condition
+        - action_call
+        - recipient
+    EventsHandlerDto:
+      type: object
+      properties:
+        matching_strategy:
+          type: string
+          default: match-first
+          enum:
+            - match-first
+            - match-all
+        matchers:
+          type: array
+          items:
+            $ref: '#/components/schemas/EventMatcherDto'
+      required:
+        - matchers
+    SegmentationJobDefinitionDto:
+      type: object
+      properties:
+        type:
+          type: string
+          default: segmentation-job
+          enum:
+            - segmentation-job
+        recipients:
+          $ref: '#/components/schemas/RecipientsDto'
+        segmentations:
+          type: array
+          items:
+            $ref: '#/components/schemas/SegmentationDto'
+        events_handler:
+          $ref: '#/components/schemas/EventsHandlerDto'
+      required:
+        - type
+        - recipients
+        - segmentations
+    JobDto:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+          format: uuid
+        created_at:
+          format: date-time
+          type: string
+          readOnly: true
+        updated_at:
+          format: date-time
+          type: string
+          readOnly: true
+        name:
+          type: string
+        tags:
+          minItems: 0
+          maxItems: 30
+          type: array
+          items:
+            type: string
+        definition:
+          discriminator:
+            propertyName: type
+          oneOf:
+            - $ref: '#/components/schemas/SegmentationJobDefinitionDto'
+      required:
+        - id
+        - created_at
+        - updated_at
+        - name
+        - definition
+    CreateJobDto:
+      type: object
+      properties:
+        name:
+          type: string
+        tags:
+          minItems: 0
+          maxItems: 30
+          type: array
+          items:
+            type: string
+        definition:
+          discriminator:
+            propertyName: type
+          oneOf:
+            - $ref: '#/components/schemas/SegmentationJobDefinitionDto'
+      required:
+        - name
+        - definition
+    UpdateJobDto:
+      type: object
+      properties:
+        name:
+          type: string
+        tags:
+          minItems: 0
+          maxItems: 30
+          type: array
+          items:
+            type: string
+        definition:
+          discriminator:
+            propertyName: type
+          oneOf:
+            - $ref: '#/components/schemas/SegmentationJobDefinitionDto'
+    ActionCallSucceededEvent:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        event_type:
+          type: string
+          enum:
+            - action-call-succeeded
+            - action-call-failed
+            - action-call-info
+            - recipient-response
+            - run-item-skipped
+            - run-item-failed
+          readOnly: true
+        src_ctx:
+          type: string
+        occurred_at:
+          format: date-time
+          type: string
+        event_data:
+          type: object
+        job_id:
+          type: string
+        job_run_id:
+          type: string
+        recipient_id:
+          type: object
+        action_id:
+          type: string
+          readOnly: true
+        invocation_id:
+          type: string
+      required:
+        - id
+        - event_type
+        - src_ctx
+        - occurred_at
+        - event_data
+        - job_id
+        - job_run_id
+        - recipient_id
+        - action_id
+    RecipientResponseEvent:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        event_type:
+          type: string
+          enum:
+            - action-call-succeeded
+            - action-call-failed
+            - action-call-info
+            - recipient-response
+            - run-item-skipped
+            - run-item-failed
+        src_ctx:
+          type: string
+        occurred_at:
+          format: date-time
+          type: string
+        event_data:
+          type: object
+        job_id:
+          type: string
+        job_run_id:
+          type: string
+        recipient_id:
+          type: object
+      required:
+        - id
+        - event_type
+        - src_ctx
+        - occurred_at
+        - event_data
+        - job_id
+        - job_run_id
+        - recipient_id
+    StatsMetricDto:
+      type: object
+      properties:
+        name:
+          type: string
+          readOnly: true
+        statistics:
+          type: string
+          readOnly: true
+          enum:
+            - recipient-distinct-count
+        value:
+          type: number
+          readOnly: true
+        occurred_at_min:
+          format: date-time
+          type: string
+          readOnly: true
+        occurred_at_max:
+          format: date-time
+          type: string
+          readOnly: true
+      required:
+        - name
+        - statistics
+        - value
+    ActionCallInfoEvent:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        event_type:
+          type: string
+          enum:
+            - action-call-succeeded
+            - action-call-failed
+            - action-call-info
+            - recipient-response
+            - run-item-skipped
+            - run-item-failed
+          readOnly: true
+        src_ctx:
+          type: string
+        occurred_at:
+          format: date-time
+          type: string
+        event_data:
+          type: object
+        job_id:
+          type: string
+        job_run_id:
+          type: string
+        recipient_id:
+          type: object
+        action_id:
+          type: string
+          readOnly: true
+        invocation_id:
+          type: string
+      required:
+        - id
+        - event_type
+        - src_ctx
+        - occurred_at
+        - event_data
+        - job_id
+        - job_run_id
+        - recipient_id
+        - action_id
+    EventErrorDto:
+      type: object
+      properties:
+        code:
+          type: string
+        details:
+          type: string
+      required:
+        - details
+    ActionCallFailedEvent:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        event_type:
+          type: string
+          enum:
+            - action-call-succeeded
+            - action-call-failed
+            - action-call-info
+            - recipient-response
+            - run-item-skipped
+            - run-item-failed
+          readOnly: true
+        src_ctx:
+          type: string
+        occurred_at:
+          format: date-time
+          type: string
+        event_data:
+          type: object
+        job_id:
+          type: string
+        job_run_id:
+          type: string
+        recipient_id:
+          type: object
+        action_id:
+          type: string
+          readOnly: true
+        invocation_id:
+          type: string
+        error:
+          $ref: '#/components/schemas/EventErrorDto'
+      required:
+        - id
+        - event_type
+        - src_ctx
+        - occurred_at
+        - event_data
+        - job_id
+        - job_run_id
+        - recipient_id
+        - action_id
+    CreateJobRunDto:
+      type: object
+      properties:
+        name:
+          type: string
+        start_at:
+          format: date-time
+          type: string
+        end_at:
+          format: date-time
+          type: string
+        job_id:
+          type: string
+          format: uuid
+      required:
+        - name
+        - start_at
+        - end_at
+        - job_id
+    JobRunDto:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+          format: uuid
+        created_at:
+          format: date-time
+          type: string
+          readOnly: true
+        updated_at:
+          format: date-time
+          type: string
+          readOnly: true
+        name:
+          type: string
+        start_at:
+          format: date-time
+          type: string
+        end_at:
+          format: date-time
+          type: string
+        job_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          readOnly: true
+          enum:
+            - scheduled
+            - running
+            - paused
+            - stopped
+            - failed
+            - completed
+            - draft
+      required:
+        - id
+        - created_at
+        - updated_at
+        - name
+        - start_at
+        - end_at
+        - job_id
+        - status
+    StatsRunSummaryDto:
+      type: object
+      properties:
+        job_run_id:
+          type: string
+          readOnly: true
+        summary:
+          readOnly: true
+          type: array
+          items:
+            $ref: '#/components/schemas/StatsRunSummaryDto'
+      required:
+        - job_run_id
+        - summary
+security:
+  - bearerAuth: [ ]
